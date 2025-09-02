@@ -52,10 +52,6 @@
                                     <a href="<c:url value='/product/${product.id}' />" class="text-decoration-none">${product.name}</a>
                                 </h5>
                                 <p class="card-text mt-auto"><strong>价格: ￥${product.price}</strong></p>
-                                <!-- 添加调试信息 -->
-                                <p class="text-muted small">
-                                    图片路径: <c:url value='/resources/images/products/${product.imagePath}'/>
-                                </p>
                             </div>
                         </div>
                     </div>
