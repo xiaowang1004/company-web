@@ -37,7 +37,12 @@ public class ProductServiceImpl implements ProductService {
         logger.info("Product description: {}", product.getDescription());
         logger.info("Product price: {}", product.getPrice());
         try {
-            productRepository.insert(product);
+            if (product.getId() == null) {
+                productRepository.insert(product);
+            }else {
+                updateProduct(product);
+            }
+
             logger.info("Product saved successfully");
         } catch (Exception e) {
             logger.error("Error saving product: {}", e.getMessage(), e);
