@@ -40,29 +40,14 @@ public class AdminController {
     @Autowired
     private ProductService productService;
 
-    // 图片路径由 ServletContext 动态获取
+    @Value("${image.storage.path}")
     private String imageStoragePath;
-
-    @Autowired
-    private ServletContext servletContext;
 
     @Autowired
     private Environment env;
 
     @Autowired
     private AdminRepository adminRepository;
-
-    @PostConstruct
-    public void init() {
-        // 运行时动态获取图片存储目录
-        imageStoragePath = servletContext.getRealPath("/resources/images/products/");
-        File uploadDir = new File(imageStoragePath);
-        if (!uploadDir.exists()) {
-            boolean created = uploadDir.mkdirs();
-            logger.info("Created image storage directory: {}, result: {}", imageStoragePath, created);
-        }
-        logger.info("动态图片存储目录: {}", imageStoragePath);
-    }
 
     @GetMapping("/login")
     public String showLoginPage() {
@@ -103,9 +88,7 @@ public class AdminController {
         model.addAttribute("products", products);
         model.addAttribute("newProduct", new Product());
         model.addAttribute("imageStoragePath", imageStoragePath);
-        model.addAttribute("rawImageStoragePath", env.getProperty("image.storage.path"));
         logger.info("Image storage path: {}", imageStoragePath);
-        logger.info("Raw image storage path: {}", env.getProperty("image.storage.path"));
         return "admin";
     }
 
@@ -173,19 +156,17 @@ public class AdminController {
         if (file != null && !file.isEmpty()) {
             logger.info("[图片上传] 收到图片文件: {}, 大小: {} bytes", file.getOriginalFilename(), file.getSize());
 
-            // 动态获取图片存储目录
-            String imageDir = servletContext.getRealPath("/resources/images/products/");
-            File uploadDir = new File(imageDir);
+            File uploadDir = new File(imageStoragePath);
             if (!uploadDir.exists()) {
                 boolean created = uploadDir.mkdirs();
-                logger.info("[图片上传] 创建图片目录: {}, 结果: {}", imageDir, created);
+                logger.info("[图片上传] 创建图片目录: {}, 结果: {}", imageStoragePath, created);
             }
 
             // 若是更新操作且原图片存在，先删除原图片文件
             if (id != null) {
                 Product existingProduct = productService.getProductById(id);
                 if (existingProduct != null && existingProduct.getImagePath() != null) {
-                    File oldImageFile = new File(imageDir, existingProduct.getImagePath());
+                    File oldImageFile = new File(imageStoragePath, existingProduct.getImagePath());
                     if (oldImageFile.exists() && oldImageFile.isFile()) {
                         boolean deleted = oldImageFile.delete();
                         logger.info("[图片上传] 删除旧图片: {}，结果: {}", oldImageFile.getAbsolutePath(), deleted);
@@ -196,7 +177,7 @@ public class AdminController {
             }
 
             String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-            File targetFile = new File(imageDir, fileName);
+            File targetFile = new File(imageStoragePath, fileName);
             logger.info("[图片上传] 目标文件路径: {}", targetFile.getAbsolutePath());
 
             try {
