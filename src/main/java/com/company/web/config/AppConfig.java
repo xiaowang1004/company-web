@@ -25,12 +25,14 @@ import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.annotation.MapperScan;
 
+import java.io.File;
+
 @Configuration
 @EnableWebMvc
 @EnableTransactionManagement
 @MapperScan("com.company.web.repository")
 @ComponentScan(basePackages = "com.company.web")
-@PropertySource("classpath:database.properties")
+@PropertySource({"classpath:database.properties", "classpath:application.properties"})
 public class AppConfig implements WebMvcConfigurer {
 
     private static final Logger logger = LoggerFactory.getLogger(AppConfig.class);
@@ -53,6 +55,7 @@ public class AppConfig implements WebMvcConfigurer {
         logger.info("jdbc.username: {}", env.getProperty("jdbc.username"));
         logger.info("hibernate.dialect: {}", env.getProperty("hibernate.dialect"));
         logger.info("hibernate.hbm2ddl.auto: {}", env.getProperty("hibernate.hbm2ddl.auto"));
+        logger.info("image.storage.path: {}", env.getProperty("image.storage.path"));
     }
 
 @Override
@@ -60,11 +63,19 @@ public void addResourceHandlers(org.springframework.web.servlet.config.annotatio
     String realResourcesPath = servletContext.getRealPath("/resources/");
     logger.info("[静态资源映射] 真实物理路径: {}", realResourcesPath);
     registry.addResourceHandler("/resources/**").addResourceLocations("file:" + realResourcesPath);
+    logger.info("[静态资源映射] 映射 /resources/** 到 {}", "file:" + realResourcesPath);
 
     // 添加图片存储路径的映射
     String imageStoragePath = env.getProperty("image.storage.path");
     logger.info("[图片资源映射] 真实物理路径: {}", imageStoragePath);
-    registry.addResourceHandler("/images/**").addResourceLocations("file:" + imageStoragePath);
+    registry.addResourceHandler("/resources/images/products/**").addResourceLocations("file:" + imageStoragePath);
+    logger.info("[图片资源映射] 映射 /resources/images/products/** 到 {}", "file:" + imageStoragePath);
+
+    // 检查目录是否存在和可写
+    File resourceDir = new File(realResourcesPath);
+    File imageDir = new File(imageStoragePath);
+    logger.info("[资源目录检查] 静态资源目录存在: {}, 可写: {}", resourceDir.exists(), resourceDir.canWrite());
+    logger.info("[资源目录检查] 图片存储目录存在: {}, 可写: {}", imageDir.exists(), imageDir.canWrite());
 }
 
 

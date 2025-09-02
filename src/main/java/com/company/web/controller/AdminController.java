@@ -43,6 +43,16 @@ public class AdminController {
     @Value("${image.storage.path}")
     private String imageStoragePath;
 
+    @PostConstruct
+    public void init() {
+        File uploadDir = new File(imageStoragePath);
+        if (!uploadDir.exists()) {
+            boolean created = uploadDir.mkdirs();
+            logger.info("[初始化] 创建图片存储目录: {}, 结果: {}", imageStoragePath, created);
+        }
+        logger.info("[初始化] 图片存储路径: {}", imageStoragePath);
+    }
+
     @Autowired
     private Environment env;
 
@@ -161,6 +171,7 @@ public class AdminController {
                 boolean created = uploadDir.mkdirs();
                 logger.info("[图片上传] 创建图片目录: {}, 结果: {}", imageStoragePath, created);
             }
+            logger.info("[图片上传] 上传目录是否存在: {}, 是否可写: {}", uploadDir.exists(), uploadDir.canWrite());
 
             // 若是更新操作且原图片存在，先删除原图片文件
             if (id != null) {
@@ -200,6 +211,10 @@ public class AdminController {
             } else {
                 logger.error("[图片上传] 文件写入失败，文件不存在");
             }
+
+            // 添加新的日志记录，检查图片是否可以通过 HTTP 访问
+            String imageUrl = "/resources/images/products/" + fileName;
+            logger.info("[图片上传] 尝试通过 HTTP 访问图片: {}", imageUrl);
         } else {
             logger.info("[图片上传] 没有收到图片文件");
         }
