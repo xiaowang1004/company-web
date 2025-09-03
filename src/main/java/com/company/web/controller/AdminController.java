@@ -222,6 +222,22 @@ public class AdminController {
         try {
             productService.saveProduct(product);
             logger.info("[产品保存] 产品保存成功. ID: {}, Name: {}, ImagePath: {}", product.getId(), product.getName(), product.getImagePath());
+            
+            // 添加新的日志来确认图片压缩
+            if (product.getImagePath() != null && !product.getImagePath().isEmpty()) {
+                File compressedFile = new File(imageStoragePath, product.getImagePath());
+                if (compressedFile.exists()) {
+                    long fileSizeKB = compressedFile.length() / 1024;
+                    logger.info("[图片压缩] 压缩后的图片大小: {} KB", fileSizeKB);
+                    if (fileSizeKB <= 500) {
+                        logger.info("[图片压缩] 图片已成功压缩到500KB以下");
+                    } else {
+                        logger.warn("[图片压缩] 图片压缩后仍超过500KB");
+                    }
+                } else {
+                    logger.warn("[图片压缩] 压缩后的图片文件不存在");
+                }
+            }
         } catch (Exception e) {
             logger.error("[产品保存] 保存产品时发生错误: {}", e.getMessage(), e);
         }

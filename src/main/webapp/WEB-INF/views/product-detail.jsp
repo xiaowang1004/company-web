@@ -39,13 +39,13 @@
     <div class="container mt-5 flex-grow-1">
         <div class="content">
             <div class="row">
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <img src="<c:url value='/resources/images/products/${product.imagePath}'/>" alt="${product.name}" class="card-img-top product-img-top">
-                    </div>
-                </div>
+<div class="col-md-6 mb-4">
+    <div class="card product-detail-card">
+        <img src="<c:url value='/resources/images/products/${product.imagePath}'/>" alt="${product.name}" class="card-img-top product-detail-img">
+    </div>
+</div>
                 <div class="col-md-6">
-                    <div class="card">
+                    <div class="card product-detail-card">
                         <div class="card-body">
                             <h1 class="card-title mb-3">${product.name}</h1>
                             <pre class="product-description"><c:out value="${product.description}" escapeXml="true" /></pre>
