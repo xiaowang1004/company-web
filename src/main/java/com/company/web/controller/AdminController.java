@@ -229,10 +229,10 @@ public class AdminController {
                 if (compressedFile.exists()) {
                     long fileSizeKB = compressedFile.length() / 1024;
                     logger.info("[图片压缩] 压缩后的图片大小: {} KB", fileSizeKB);
-                    if (fileSizeKB <= 500) {
-                        logger.info("[图片压缩] 图片已成功压缩到500KB以下");
+                    if (fileSizeKB <= 50) {
+                        logger.info("[图片压缩] 图片已成功压缩到50KB以下");
                     } else {
-                        logger.warn("[图片压缩] 图片压缩后仍超过500KB");
+                        logger.warn("[图片压缩] 图片压缩后仍超过50KB");
                     }
                 } else {
                     logger.warn("[图片压缩] 压缩后的图片文件不存在");
